@@ -1,40 +1,88 @@
-# Vehicle Parking Management System V2
+# 🚗 Vehicle Parking Management System V2
 
-A multi-user application for managing parking lots, parking spots, and parked vehicles. Built with Flask backend and Vue.js frontend, using Redis for caching and Celery for background jobs.
+A multi-user web application for managing parking lots, spots, and vehicles — built with a **Flask** backend, **Vue.js** frontend, **Redis** caching, and **Celery** background jobs.
 
-## Features
+---
 
-### Admin Features
-- Create/Edit/Delete parking lots
+## 📽️ Demo Video
+
+▶️ **[Watch the Project Demo](https://drive.google.com/file/d/1otF0RZeWeOVNzqMmRzsQI2i2Wp-o6hS7/view)**
+
+## 📄 Project Documentation
+
+📑 **[View Full Project Document](https://drive.google.com/file/d/1Oc33PLsyZK62_4RO2oWiSkeoq2R82Knt/view?usp=sharing)**
+
+---
+
+## ✨ Features
+
+### 👤 Admin
+- Create / Edit / Delete parking lots
 - Manage parking spots (auto-created based on lot capacity)
-- View all registered users
+- View all registered users and their status
 - View parking spot status and parked vehicle details
-- Summary charts for parking lots/spots
-- Trigger scheduled tasks manually
+- Summary charts for parking lots and spots
+- Trigger scheduled Celery tasks manually
 
-### User Features
-- Register/Login with JWT authentication
-- Choose available parking lot (spot auto-allocated)
-- Book parking spot with **real-time time tracking**
+### 🙋 User
+- Register / Login with **JWT authentication**
+- Choose an available parking lot (spot auto-allocated)
+- Book a parking spot with **real-time time tracking**
 - **Live duration counter** and **current cost display** during parking
-- Release/vacate parking spot with **automatic time-based billing**
+- Release/vacate spot with **automatic time-based billing**
 - View booking summary with charts showing hours parked
- - Review historical spending, duration, and rating data in dashboards
+- Review historical spending, duration, and rating data in dashboards
 
-## Tech Stack
+---
 
-| Component | Technology |
-|-----------|------------|
-| Backend | Flask 3.1.0 |
-| Frontend | Vue.js 2 (CDN) |
-| Database | SQLite |
-| Caching | **Redis** (required) |
-| Background Jobs | **Celery** (required) |
-| Styling | Bootstrap 5 |
-| Charts | Chart.js |
-| Authentication | Flask-JWT-Extended |
+## 🛠️ Tech Stack
 
-## Project Structure
+| Component       | Technology               |
+|----------------|--------------------------|
+| Backend         | Flask 3.1.0              |
+| Frontend        | Vue.js 2 (CDN)           |
+| Database        | SQLite                   |
+| Caching         | Redis *(required)*       |
+| Background Jobs | Celery *(required)*      |
+| Styling         | Bootstrap 5              |
+| Charts          | Chart.js                 |
+| Authentication  | Flask-JWT-Extended       |
+
+---
+
+## ⏱️ Time-Based Pricing (Key Feature)
+
+The system tracks **exact parking duration** and calculates charges based on **actual time spent**:
+
+| Feature | Detail |
+|---|---|
+| ✅ Real-time tracking | Live duration updates every minute on dashboard |
+| ✅ Fair billing | Pay only for actual time used (rounded up to next hour) |
+| ✅ Live cost display | See estimated cost while actively parked |
+| ✅ Analytics | View total hours parked and average cost per hour |
+
+### How It Works
+
+```
+1. Book Parking   → System records exact start time
+2. During Parking → Dashboard shows live duration ("3h 45m") and cost ("₹180")
+3. Complete       → Actual hours calculated, rounded up, total billed
+4. Analytics      → Hours parked + cost efficiency visible in dashboard
+```
+
+**Example:**
+```
+Started:   10:00 AM
+Completed:  1:45 PM
+─────────────────────
+Actual Time: 3.75 hours
+Hours Charged: 4 hours (rounded up)
+Total Amount: 4 × ₹45 = ₹180
+```
+
+---
+
+## 📁 Project Structure
 
 ```
 PROJECT/
@@ -59,99 +107,121 @@ PROJECT/
 └── README.md
 ```
 
-## Prerequisites
+---
 
-1. **Python 3.9+**
-2. **Redis Server** (required for caching and Celery)
-   ```bash
-   # macOS
-   brew install redis
+## 🚀 Getting Started
 
-   ```
+### Prerequisites
+- Python 3.9+
+- Redis Server
 
-## Installation & Setup
-
-### 1. Clone and Navigate
 ```bash
-cd PROJECT
+# macOS
+brew install redis
 ```
 
-### 2. Quick Start (Recommended)
+### Quick Start *(Recommended)*
+
 ```bash
+cd PROJECT
 chmod +x start.sh stop.sh
 ./start.sh
 ```
 
-This will:
-- Start Redis server
-- Create virtual environment
-- Install dependencies
-- Start Celery worker (background tasks)
-- Start Celery beat (scheduled tasks)
-- Start Flask server
+This script will automatically:
+1. Start Redis server
+2. Create Python virtual environment
+3. Install all dependencies
+4. Start Celery worker (background tasks)
+5. Start Celery beat (scheduled tasks)
+6. Start Flask server
 
-### 3. Manual Setup
+### Manual Setup
 
-#### Start Redis
 ```bash
+# Start Redis
 redis-server
 
-```
-brew services start redis
-brew services restart redis
-redis-cli shutdown
-#### Backend Setup
-```bash
+# Backend setup
 cd backend
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-```
 
-#### Start Celery Worker
-```bash
-cd backend
+# Start Celery worker
 celery -A app.celery worker --loglevel=info
-```
 
-#### Start Celery Beat (Scheduler)
-```bash
-cd backend
+# Start Celery beat (scheduler)
 celery -A app.celery beat --loglevel=info
-```
 
-#### Start Flask Server
-```bash
-cd backend
+# Start Flask
 python3 app.py
 ```
 
-### 4. Access the Application
-- **Web App**: http://localhost:5001
-- **API Docs (Swagger)**: http://localhost:5001/apidocs
+### Access the App
 
-## Default Credentials
+| URL | Description |
+|-----|-------------|
+| http://localhost:5001 | Web Application |
+| http://localhost:5001/apidocs | Swagger API Docs |
 
-| Role | Username | Password |
-|------|----------|----------|
-| Admin | admin@parking.com | admin123 |
+### Default Credentials
 
-## Dev Notes From Daily Use
+| Role  | Username           | Password  |
+|-------|--------------------|-----------|
+| Admin | admin@parking.com  | admin123  |
 
-- After pulling fresh migrations, run `flask db upgrade` inside `backend/venv` or the login screen will keep 500-ing.
-- Redis likes to linger after crashes; `redis-cli ping` is my quick smoke test before blaming Vue.
-- When tweaking charts, hot-reload via `python app.py` + `npm` isn’t a thing here, so I keep the browser devtools console pinned to catch the Flask prints.
+---
 
-## Background Jobs (Celery)
+## 📡 API Reference
 
-### Scheduled Tasks (Celery Beat)
+### Authentication
 
-| Task | Schedule | Description |
-|------|----------|-------------|
-| Daily Reminders | 6:00 PM daily | Sends reminders to users who haven't booked recently |
-| Monthly Report | 1st of each month | Sends HTML activity report to all users via email |
+| Method | Endpoint       | Description       |
+|--------|----------------|-------------------|
+| POST   | `/register`    | User registration |
+| POST   | `/login`       | User login        |
+| POST   | `/admin/login` | Admin login       |
+
+### Customer
+
+| Method   | Endpoint                          | Description                      |
+|----------|-----------------------------------|----------------------------------|
+| GET/PUT  | `/customer/profile`               | Get / Update profile             |
+| GET      | `/customer/dashboard`             | Dashboard with parking lots      |
+| POST     | `/customer/book/<lot_id>`         | Book a parking spot              |
+| PUT      | `/customer/booking/<id>/complete` | Complete booking with rating     |
+| PUT      | `/customer/booking/<id>/cancel`   | Cancel booking                   |
+| POST     | `/customer/search`                | Search parking lots              |
+| GET      | `/customer/summary`               | Booking summary *(cached 5 min)* |
+
+### Admin
+
+| Method         | Endpoint                              | Description                        |
+|----------------|---------------------------------------|------------------------------------|
+| GET            | `/admin/dashboard`                    | Dashboard statistics               |
+| GET/POST       | `/admin/lots`                         | List / Create parking lots         |
+| GET/PUT/DELETE | `/admin/lots/<id>`                    | Manage a specific lot              |
+| GET            | `/admin/users`                        | List all users                     |
+| PUT            | `/admin/users/<id>/<field>/<value>`   | Update user status                 |
+| POST           | `/admin/search`                       | Search all entities                |
+| GET            | `/admin/summary`                      | Analytics summary *(cached 5 min)* |
+| POST           | `/admin/trigger/daily-reminders`      | Trigger reminders manually         |
+| POST           | `/admin/trigger/monthly-report`       | Trigger monthly report manually    |
+
+---
+
+## ⚙️ Background Jobs (Celery)
+
+### Scheduled Tasks
+
+| Task             | Schedule            | Description                                    |
+|------------------|---------------------|------------------------------------------------|
+| Daily Reminders  | 6:00 PM daily       | Reminds users who haven't booked recently      |
+| Monthly Report   | 1st of each month   | Sends HTML activity report to all users        |
 
 ### Manual Trigger (Admin Only)
+
 ```bash
 # Trigger daily reminders
 curl -X POST http://localhost:5001/admin/trigger/daily-reminders \
@@ -162,142 +232,86 @@ curl -X POST http://localhost:5001/admin/trigger/monthly-report \
   -H "Authorization: Bearer <token>"
 ```
 
-## Redis Caching
+---
 
-The following endpoints are cached:
-- `/customer/summary` - 5 minutes
-- `/admin/summary` - 5 minutes
+## 🔴 Redis Caching
 
-### Check Cache Status
+Cached endpoints:
+- `/customer/summary` — 5 minutes
+- `/admin/summary` — 5 minutes
+
 ```bash
+# Check cache status
 curl http://localhost:5001/api/cache/status
-```
 
-### Check Celery Status
-```bash
+# Check Celery status
 curl http://localhost:5001/api/celery/status
 ```
 
-## API Endpoints
+---
 
-### Authentication
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/register` | User registration |
-| POST | `/login` | User login |
-| POST | `/admin/login` | Admin login |
+## 📧 Email & Notifications
 
-### Customer
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET/PUT | `/customer/profile` | Get/Update profile |
-| GET | `/customer/dashboard` | Dashboard data with parking lots |
-| POST | `/customer/book/<lot_id>` | Book a parking spot |
-| PUT | `/customer/booking/<id>/complete` | Complete booking with rating |
-| PUT | `/customer/booking/<id>/cancel` | Cancel booking |
-| POST | `/customer/search` | Search parking lots |
-| GET | `/customer/summary` | Booking summary (cached) |
-
-### Admin
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/admin/dashboard` | Dashboard statistics |
-| GET/POST | `/admin/lots` | List/Create parking lots |
-| GET/PUT/DELETE | `/admin/lots/<id>` | Manage specific lot |
-| GET | `/admin/users` | List all users |
-| PUT | `/admin/users/<id>/<field>/<value>` | Update user status |
-| POST | `/admin/search` | Search all entities |
-| GET | `/admin/summary` | Analytics summary (cached) |
-| POST | `/admin/trigger/daily-reminders` | Trigger reminders manually |
-| POST | `/admin/trigger/monthly-report` | Trigger report manually |
-
-## Email Configuration
-
-For email notifications to work, configure these environment variables:
+Configure these environment variables for email notifications:
 
 ```bash
 export MAIL_SERVER=smtp.gmail.com
 export MAIL_PORT=587
 export MAIL_USERNAME=your-email@gmail.com
 export MAIL_PASSWORD=your-app-password
-```
 
-For Google Chat webhooks:
-```bash
+# Optional: Google Chat webhook
 export GOOGLE_CHAT_WEBHOOK_URL=your-webhook-url
 ```
 
-## ⏱️ Time-Based Pricing Feature (NEW)
+---
 
-### Overview
-The system now tracks **exact parking duration** and calculates charges based on **actual time spent**:
+## 🗄️ Database Schema
 
-- ✅ **Real-time tracking**: Dashboard shows live duration (updates every minute)
-- ✅ **Fair billing**: Pay only for actual time used (rounded up to next hour)
-- ✅ **Live cost display**: See current estimated cost while parking
-- ✅ **Analytics**: View total hours parked and average cost per hour
+| Table            | Key Fields                                                                                  |
+|------------------|---------------------------------------------------------------------------------------------|
+| `Users`          | id, username, password, role, approved, blocked, created_at                                 |
+| `CustomerProfile`| id, user_id, full_name, phone_no, address, pincode, vehicle_number, vehicle_type            |
+| `ParkingLot`     | id, name, address, pincode, price_per_hour, max_spots, description, is_active               |
+| `ParkingSpot`    | id, lot_id, spot_number, status (A/O/R/M), spot_type                                        |
+| `Booking`        | id, customer_id, lot_id, spot_id, start_time, end_time, **actual_hours**, **hours_charged**, total_amount, rating |
 
-### How It Works
+---
 
-1. **Book Parking** → System records exact start time
-2. **During Parking** → Dashboard displays:
-   - Live duration: "3h 45m"
-   - Current cost: "₹180"
-3. **Complete Booking** → System calculates:
-   - Actual hours: 3.75 hours
-   - Hours charged: 4 hours (rounded up)
-   - Total amount: 4 × ₹45 = ₹180
-4. **View Analytics** → See hours parked and cost efficiency
-
-### Example
-```
-Started: 10:00 AM
-Completed: 1:45 PM
------------------------
-Actual Time: 3.75 hours
-Charged: 4 hours
-Amount: ₹180
-```
-
-📖 **For detailed documentation, see:**
-- `TIME_TRACKING_FEATURE.md` - Implementation details
-- `TIME_TRACKING_FLOW.md` - Visual flow diagrams
-- `QUICK_START.md` - Complete setup guide
-
-## Stopping Services
+## 🛑 Stopping Services
 
 ```bash
 ./stop.sh
 ```
 
 Or manually:
+
 ```bash
 pkill -f "celery -A app.celery"
 pkill -f "python3 app.py"
 redis-cli shutdown
 ```
 
-## Database Schema
+---
 
-### Users
-- id, username, password, role, approved, blocked, created_at
+## 🧑‍💻 Dev Notes
 
-### CustomerProfile
-- id, user_id, full_name, phone_no, address, pincode, vehicle_number, vehicle_type
+- After pulling fresh migrations, run `flask db upgrade` inside `backend/venv` or the login screen will 500.
+- Redis likes to linger after crashes — `redis-cli ping` is a quick smoke test before blaming Vue.
+- No hot-reload here; keep browser devtools console open to catch Flask prints while tweaking charts.
 
-### ParkingLot
-- id, name, address, pincode, price_per_hour, max_spots, description, is_active
+---
 
-### ParkingSpot
-- id, lot_id, spot_number, status (A/O/R/M), spot_type
+## 📚 Additional Documentation
 
-### Booking
-- id, customer_id, lot_id, spot_id, vehicle_number, status
-- booking_date, start_time, end_time, hours_booked
-- **actual_hours** (Float), **hours_charged** (Integer) - NEW: Time tracking
-- total_amount, amount_paid, rating, remarks
+| File | Description |
+|------|-------------|
+| `TIME_TRACKING_FEATURE.md` | Implementation details for time-based billing |
+| `TIME_TRACKING_FLOW.md` | Visual flow diagrams |
+| `QUICK_START.md` | Complete setup guide |
 
-## License
+---
+
+## 📜 License
 
 MIT License
-https://drive.google.com/file/d/1Oc33PLsyZK62_4RO2oWiSkeoq2R82Knt/view?usp=sharing
